@@ -1,0 +1,5 @@
+#.gitignore 
+secret.h
+.env
+*DS_Store
+*.vscode
