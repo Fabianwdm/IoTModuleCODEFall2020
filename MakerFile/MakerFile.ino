@@ -1,59 +1,53 @@
-#include "secret.h"
+#include "TESTsecret.h"
 #include "Firebase_Arduino_WiFiNINA.h"
-#include "firebaseConnection.h"
-#include "light.h"
-#include "weight.h"
+#include "TESTfirebaseConnection.h"
+#include "TESTlight.h"
+#include "HX711.h"
+#include "Adafruit_NeoPixel.h"
 
-//Define Firebase data object
-FirebaseData firebaseData;
+#define TENMINUTES (60*1000L) // ten minutes are 600000 milliseconds
+float previousValue;
+String empty = "Sarah/hexempty";
+String full = "Sarah/hexfull";
+String reminder = "Sarah/hexreminder";
+
 
 void setup() {
+  strip.setBrightness(255); 
   pinMode(led1, OUTPUT);
-  pinMode(btn, INPUT_PULLUP);
-  Serial.begin(115200);
-  delay(100);
+  theaterChase(strip.Color(127, 127, 127), 50, 20);
+  Serial.begin(9600);
+  delay(100); 
   Serial.println();
   firebaseSetup();
-  } 
+  setp();
+  scale.tare();
+  ColorMe(0,0,0);
+  delay(2000);
+  setEmptyCup(empty);
+  setEmptyCup(full);
+  setEmptyCup(reminder);
+  giveMeInformation();
+  }
 
+
+unsigned long last10Minutes;
 
  void loop() {
-    LEDval = Firebase.getInt(firebaseData, "_CONFIG/LED_STATUS");
-    LEDval = firebaseData.intData();
-  
-  if(LEDval==1){
-    digitalWrite(led1, HIGH);
-    ColorMe(100,100,100);
-  } else {
-    digitalWrite(led1, LOW);
-    ColorMe(0,0,0); }
-  
-  buttonNew = digitalRead(btn);
-  
-  if (buttonOld == 0 && buttonNew == 1) {
-    if (btnState == 0) {
-      btnState = 1;
-      Firebase.setInt(firebaseData, "_CONFIG/LED_STATUS", 1);
-    } else {
-      btnState = 0;
-      Firebase.setInt(firebaseData, "_CONFIG/LED_STATUS", 0);
+    float objectVal = dataR();
+    if (millis()-last10Minutes >= TENMINUTES){
+      last10Minutes+=TENMINUTES;
+      Serial.println("One Minutes Has Passed");
     }
-  }
-  buttonOld = buttonNew;
-  delay(100);
-    
-  int val = 0;
-
-  if (Firebase.getInt(firebaseData, "_CONFIG/RED")) {
-    //Success, then read the payload value
-    //Make sure payload value returned from server is integer
-    //This prevent you to get garbage data
-    if (firebaseData.dataType() == "int") {
-      val = firebaseData.intData();
-      Serial.println(val); }
-  } else {
-    //Failed, then print out the error detail
-    Serial.println(firebaseData.errorReason());
-  }
-   delay(1000);
+    //updateWeight(objectVal);
+    //weightColor(objectVal);
+    //Serial.println(objectVal);
+    /*
+    float val = testValue();
+    weightColor(objectVal);
+    updateWeight(objectVal);
+    val = Firebase.getInt(firebaseData, "_CONFIG/WEIGHT");
+    Serial.println(val); */
+    //testInt();
+    //testFloat("testFloat");
   }
