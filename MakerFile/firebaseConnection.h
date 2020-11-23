@@ -65,7 +65,6 @@ void updateDateServer(String timer) {
    String hasCity = (firebaseData.jsonData());
    if(hasCity.indexOf(timer) > 0)
    {
-    Serial.println("Hell Yes");
    }
    if(hasCity.indexOf(timer) != 0){
     Firebase.setString(firebaseData, loc + timer, "0" );
