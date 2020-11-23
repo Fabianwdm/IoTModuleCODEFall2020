@@ -18,10 +18,10 @@ int reminderR, reminderG, reminderB;
 unsigned long holdValue;
 unsigned long drinkMinutes;
 unsigned long last10Minutes;
-unsigned long maxWaitTime = 30000;
-unsigned long averageDrinkTime = 10000;
+unsigned long maxWaitTime = 60000;
+unsigned long averageDrinkTime = 30000;
 
-
+//Sets all lights one color
 void ColorMe(int R, int G, int B) {
   for (int i = 0; i < NUM_LEDS; i++) {
     strip.setPixelColor(i, strip.Color(R, G, B)); 
@@ -122,6 +122,7 @@ void giveMeInformation() {
   delay(5000);
 }
 
+//Calls functions that set RGB colors for use in application.
 void setColors() {
   String empty = "user/hexempty";
   String full = "user/hexfull";
@@ -132,11 +133,12 @@ void setColors() {
   giveMeInformation();
 }
 
+//Gets drink reminder time from database to be used to notify user.
 int setDrinkReminder() {
   int userReminder =  fetchInt("users/user/remindertime");
   return (((userReminder * 60) * 1000));
 }
-
+//Function is called needs to drink.
 void blinkReminder(int currentWeight, int currentWeightOld) {
   //Function will not work if current weight is 0, hence backup function below.
   while (constrain(currentWeight, (currentWeightOld * 0.90), (currentWeightOld * 1.10))) {
@@ -147,12 +149,12 @@ void blinkReminder(int currentWeight, int currentWeightOld) {
     delay(500);
   }
 }
-
+//Function is called when scale or glass is empty.
 void blinkEmptyReminder(int currentWeight, int currentWeightOld) {
   while (currentWeight < ((currentWeightOld + 10) * 0.10)) {
     currentWeight = dataR();
     Serial.println(currentWeightOld);
-    ColorMe(reminderR, reminderG, reminderB);
+    ColorMe(emptyR, emptyG, emptyB);
     delay(500);
     ColorMe(0, 0, 0);
     delay(500);
@@ -173,17 +175,17 @@ void drinkCounter(int currentWeight, int maxReading, String currentDate) {
           currentWeight = dataR();
           while (currentWeight < 11) {
             drinkMinutes = millis();
-            while ((millis() - drinkMinutes) <= maxWaitTime) {
+            while ((millis() - drinkMinutes) <= maxWaitTime + 1000) {
               currentWeight = dataR();
               // The loop assumes that the user is refilling glass after the 30 second period.
               // if user replaces glass on scale 
-              if (currentWeight > (maxReading * 0.60) && (millis() - drinkMinutes) <= (maxWaitTime - 1000)) {
+              if (currentWeight > 10 && (millis() - drinkMinutes) <= (maxWaitTime - 1000)) {
                 int currentDrinkTotal= fetchInt("users/user/drinktotal/" + currentDate); //Gets current number sorted in Database when called.
                 Firebase.setInt(firebaseData, "users/user/drinktotal/" + currentDate, (currentDrinkTotal + 1)); // Number stored in N + 1 uploaded to server.
                 Firebase.setInt(firebaseData, "users/user/drinkToday/", (currentDrinkTotal + 1)); // Number stored in N + 1 uploaded to server.
                 break;
               }
-              if (currentWeight < (maxReading * 0.60) && (millis() - drinkMinutes) >= (maxWaitTime - 1000)) {
+              if (currentWeight < 10 && (millis() - drinkMinutes) >= (maxWaitTime - 1000)) {
                 blinkEmptyReminder(currentWeight, currentWeight);
                 break;
               }

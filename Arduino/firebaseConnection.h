@@ -65,6 +65,7 @@ int fetchInt(String loc) {
 }
 
 
+//Updates new date into firebase.
 void updateDateServer(String timer) {
   String loc = "/users/user/drinktotal/";
   String n = "NOTFOUND";

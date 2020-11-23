@@ -17,7 +17,7 @@ String TodaysDate(){
     timeClient.forceUpdate();
   }
 
-  // Formats date : "2018-05-28"
+  // Formats date : "2018-05-28" Allows easier uploading to firebase.
   formattedDate = timeClient.getFormattedDate();
   int splitT = formattedDate.indexOf("T");
   dayStamp = formattedDate.substring(0, splitT);
