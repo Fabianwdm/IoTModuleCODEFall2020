@@ -5,7 +5,6 @@
 
 FirebaseData firebaseData;
 
-
 char FIREBASE_HOST[] =  SECRET_FIREBASE_API;
 char FIREBASE_AUTH[] =  SECRET_FIREBASE_AUTH;
 char WIFI_SSID[] = SECRET_SSID;
@@ -54,6 +53,17 @@ int getMaxWeight(){
     }
 }
 
+int fetchInt(String loc) {
+  int val = 0;
+  if (Firebase.getInt(firebaseData, loc)) {
+    if (firebaseData.dataType() == "int") {
+      val = firebaseData.intData();
+      return val;
+    }
+    delay(2000);
+  }
+}
+
 
 void updateDateServer(String timer) {
   String loc = "/users/user/drinktotal/";
@@ -65,54 +75,11 @@ void updateDateServer(String timer) {
    String hasCity = (firebaseData.jsonData());
    if(hasCity.indexOf(timer) > 0)
    {
+   Serial.println("Record Found");
    }
    if(hasCity.indexOf(timer) != 0){
     Firebase.setString(firebaseData, loc + timer, "0" );
     Firebase.setInt(firebaseData, loc + timer, 0 );
-    /*
-    Firebase.setString(firebaseData, "/_CONFIG/Date/" + timer, 0);
-    */
    }
   }
   }
-
-
-int fetchInt(String loc) {
-  int val = 0;
-  if (Firebase.getInt(firebaseData, loc)) {
-    if (firebaseData.dataType() == "int") {
-      val = firebaseData.intData();
-      return val;
-    }
-    delay(2000);
-
-  }
-}
-
-void  tareScale() {
-  String val = "";
-  if (Firebase.getString(firebaseData, "/_CONFIG/testString")) {
-    if (firebaseData.dataType() == "string") {
-      val = firebaseData.stringData();
-      if (val == "ON") {
-        Firebase.setString(firebaseData, "/_CONFIG/testString", "OFF");
-        Serial.println("Taring!");
-      }
-    }
-    Serial.println(val);
-  }
-  delay(2000);
-}
-
-
-void testFloat(String data) {
-  float val = 0;
-  if (Firebase.getFloat(firebaseData, "/_CONFIG/" + data)) {
-    if (firebaseData.dataType() == "float") {
-      val = firebaseData.floatData();
-      Serial.println(val);
-    }
-    delay(2000);
-  }
-
-}

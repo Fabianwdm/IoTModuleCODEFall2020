@@ -9,9 +9,6 @@ String formattedDate;
 String dayStamp;
 String timeStamp;
 
-
-
-
 //Acquires todays date on BOOT.
 String TodaysDate(){
   timeClient.begin();

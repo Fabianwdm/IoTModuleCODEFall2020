@@ -20,7 +20,6 @@ unsigned long drinkMinutes;
 unsigned long last10Minutes;
 unsigned long maxWaitTime = 30000;
 unsigned long averageDrinkTime = 10000;
-int drinkTotal;
 
 
 void ColorMe(int R, int G, int B) {
@@ -48,7 +47,6 @@ void colorSetter(float currentWeight, float maxReading) {
       oldMultiplied = multiplied;
       strip.setPixelColor(i, strip.Color(fullR, fullG, fullB)); 
       strip.show(); 
-
     }
   }
 }
@@ -163,7 +161,7 @@ void blinkEmptyReminder(int currentWeight, int currentWeightOld) {
 
 // Automattically counts the amounts of drinks within a degree of accuracy 
 // (currentWeight < 11) is used due to a rounding function, in dataR();. Rounds to nearest 10.
-void drinkCounter(int currentWeight, int maxReading) {
+void drinkCounter(int currentWeight, int maxReading, String currentDate) {
   if (currentWeight < 11) {
     holdValue = millis();
     while (currentWeight < 11 && maxReading != 0) {
@@ -180,7 +178,8 @@ void drinkCounter(int currentWeight, int maxReading) {
               // The loop assumes that the user is refilling glass after the 30 second period.
               // if user replaces glass on scale 
               if (currentWeight > (maxReading * 0.60) && (millis() - drinkMinutes) <= (maxWaitTime - 1000)) {
-                drinkTotal += 1;
+                int currentDrinkTotal= fetchInt("users/user/drinktotal/" + currentDate); //Gets current number sorted in Database when called.
+                Firebase.setInt(firebaseData, "users/user/drinktotal/" + currentDate, (currentDrinkTotal + 1)); // Number stored in N + 1 uploaded to server.
                 break;
               }
               if (currentWeight < (maxReading * 0.60) && (millis() - drinkMinutes) >= (maxWaitTime - 1000)) {
