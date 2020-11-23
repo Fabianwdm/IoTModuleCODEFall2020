@@ -67,6 +67,7 @@ int fetchInt(String loc) {
 
 void updateDateServer(String timer) {
   String loc = "/users/user/drinktotal/";
+  String n = "NOTFOUND";
   QueryFilter query;
   query.clearQuery();
   query.limitToLast(1);
@@ -76,10 +77,12 @@ void updateDateServer(String timer) {
    if(hasCity.indexOf(timer) > 0)
    {
    Serial.println("Record Found");
+   n = "RECORDFOUND";
    }
-   if(hasCity.indexOf(timer) != 0){
+   if(n == "NOTFOUND"){
     Firebase.setString(firebaseData, loc + timer, "0" );
     Firebase.setInt(firebaseData, loc + timer, 0 );
+    Firebase.setInt(firebaseData, "/users/user/drinkToday/", 0);
    }
   }
   }

@@ -18,8 +18,8 @@ int reminderR, reminderG, reminderB;
 unsigned long holdValue;
 unsigned long drinkMinutes;
 unsigned long last10Minutes;
-unsigned long maxWaitTime = 30000;
-unsigned long averageDrinkTime = 10000;
+unsigned long maxWaitTime = 60000;
+unsigned long averageDrinkTime = 30000;
 
 
 void ColorMe(int R, int G, int B) {
@@ -180,7 +180,6 @@ void drinkCounter(int currentWeight, int maxReading, String currentDate) {
               if (currentWeight > (maxReading * 0.60) && (millis() - drinkMinutes) <= (maxWaitTime - 1000)) {
                 int currentDrinkTotal= fetchInt("users/user/drinktotal/" + currentDate); //Gets current number sorted in Database when called.
                 Firebase.setInt(firebaseData, "users/user/drinktotal/" + currentDate, (currentDrinkTotal + 1)); // Number stored in N + 1 uploaded to server.
-                Firebase.setInt(firebaseData, "users/user/drinkToday/", (currentDrinkTotal + 1)); // Number stored in N + 1 uploaded to server.
                 break;
               }
               if (currentWeight < (maxReading * 0.60) && (millis() - drinkMinutes) >= (maxWaitTime - 1000)) {

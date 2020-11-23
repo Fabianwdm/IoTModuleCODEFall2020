@@ -8,7 +8,10 @@
 
 #define BUTTON_PIN   0
 
-long TENMINUTES = 0;
+long DRINKTIMER;
+long THIRTYMINUTES = 1800000;
+long baseValue;
+long reminderValue;
 int maxReading = 1000;
 int buttonNew = digitalRead(BUTTON_PIN);
 float oldObjectVal;
@@ -26,18 +29,27 @@ void setup() {
   todaysDateFormatted = TodaysDate();
   updateDateServer(todaysDateFormatted);
   setupWeight();
-
-  //maxReading = getMaxWeight();
+  maxReading = getMaxWeight();
   scale.tare();
   ColorMe(0, 0, 0);
   setColors();
   delay(2000);
-  TENMINUTES = setDrinkReminder();
+  DRINKTIMER = setDrinkReminder();
 }
 
 void loop() {
-  float objectVal = dataR();
-  Serial.println(objectVal);
+    float objectVal = dataR();
+    if (millis() - baseValue >= THIRTYMINUTES){
+      todaysDateFormatted = TodaysDate();
+      updateDateServer(todaysDateFormatted);
+      baseValue = millis();
+  }
+
+  if (millis() - reminderValue >= DRINKTIMER){
+      blinkReminder(objectVal, objectVal);
+      reminderValue = millis();
+  }
+  
   if (buttonNew == 1) {
     maxReading = maxData();
     delay(500);
@@ -45,6 +57,7 @@ void loop() {
   }
 
   colorSetter(objectVal, maxReading);
+  
   if (objectVal < (maxReading * 0.98)) {
     float objectVal = dataR();
     drinkCounter(objectVal, maxReading, todaysDateFormatted);
