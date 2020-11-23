@@ -22,7 +22,7 @@ void setup() {
   Serial.begin(9600);
   pinMode(PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-  strip.setBrightness(255);
+  strip.setBrightness(200);
   theaterChase(strip.Color(127, 127, 127), 50, 20);
   firebaseSetup();
   todaysDateFormatted = TodaysDate();

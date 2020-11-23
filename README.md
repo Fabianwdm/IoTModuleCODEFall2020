@@ -36,17 +36,21 @@ $ pip3 install -r requirements.txt
 ```
 4. Set up a Firebase Project and insert the following fields in a .json file. Replace NAME with user's name.
 
-"users" : {
-    "NAME" : {
-      "drinktotal" : 0,
-      "hexempty" : "#5e30eb",
-      "hexfull" : "#fffc41",
-      "hexreminder" : "#ff2600",
-      "name" : "NAME",
-      "reminder" : 1,
-      "weight" : 0
-    }
+{
+  "user" : {
+    "drinkToday" : 1,
+    "drinktotal" : {
+      "2020-11-22" : 0,
+      "2020-11-23" : 1
+    },
+    "hexempty" : "#00c7fc",
+    "hexfull" : "#00c7fc",
+    "hexreminder" : "#00c7fc",
+    "maxweight" : 653,
+    "name" : "Professor X",
+    "remindertime" : 10
   }
+}
 5. Acquire the Firebase Access Keys located in Project Overview/Settings/General. Scroll down and copy paste the keys that apply to the Arduino "firebaseconnection.h" file and in the WebApp/server.py file.
 
 6. Run the following commands and go to  http://127.0.0.1:5000/ .
