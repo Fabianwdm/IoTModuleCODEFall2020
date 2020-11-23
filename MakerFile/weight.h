@@ -11,7 +11,7 @@ float ounces;
 
 
 
-void setp(){
+void setupWeight(){
   Serial.println("HX711 weighing");
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
   scale.set_scale(calibration_factor);
@@ -20,9 +20,24 @@ void setp(){
 
 int dataR() {
    units = scale.get_units(),10;
-   if (units < 2.50) {
+   int n = units;
+   n = (n+5)/10;
+   n = 10*n;
+   if (units < 5.00) {
     return 0.00;
   } else { 
-   return units;
+    return units;
 }
+}
+
+int sensVal;
+
+int maxData(){
+  int c = 0;
+  while (c != 11) {
+    units = scale.get_units(),10;
+    sensVal = (sensVal, units);
+    c += 1;
+  }
+  return sensVal;
 }

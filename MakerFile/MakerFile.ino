@@ -1,53 +1,81 @@
-#include "TESTsecret.h"
+#include "dateChecker.h"
+#include "secret.h"
 #include "Firebase_Arduino_WiFiNINA.h"
-#include "TESTfirebaseConnection.h"
-#include "TESTlight.h"
+#include "firebaseConnection.h"
+#include "light.h"
 #include "HX711.h"
 #include "Adafruit_NeoPixel.h"
 
-#define TENMINUTES (60*1000L) // ten minutes are 600000 milliseconds
+#define BUTTON_PIN   0
+
+long TENMINUTES = 0;
 float previousValue;
-String empty = "Sarah/hexempty";
-String full = "Sarah/hexfull";
-String reminder = "Sarah/hexreminder";
+int maxReading = 1000;
+
 
 
 void setup() {
-  strip.setBrightness(255); 
-  pinMode(led1, OUTPUT);
-  theaterChase(strip.Color(127, 127, 127), 50, 20);
   Serial.begin(9600);
-  delay(100); 
-  Serial.println();
+  pinMode(PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  strip.setBrightness(100);
+  theaterChase(strip.Color(127, 127, 127), 50, 20);
   firebaseSetup();
-  setp();
+  String todaysDateFormatted = TodaysDate();
+  updateDateServer(todaysDateFormatted);
+  setupWeight();
+
+  //maxReading = getMaxWeight();
   scale.tare();
-  ColorMe(0,0,0);
+  ColorMe(0, 0, 0);
+  setColors();
   delay(2000);
-  setEmptyCup(empty);
-  setEmptyCup(full);
-  setEmptyCup(reminder);
-  giveMeInformation();
-  }
+  TENMINUTES = setDrinkReminder();
+}
 
+float oldObjectVal;
+int buttonNew = digitalRead(BUTTON_PIN);
 
-unsigned long last10Minutes;
-
- void loop() {
-    float objectVal = dataR();
-    if (millis()-last10Minutes >= TENMINUTES){
-      last10Minutes+=TENMINUTES;
-      Serial.println("One Minutes Has Passed");
-    }
-    //updateWeight(objectVal);
-    //weightColor(objectVal);
-    //Serial.println(objectVal);
+void loop() {
+  /*
+    Serial.println(maxReading);
+    delay(2000);
     /*
-    float val = testValue();
-    weightColor(objectVal);
-    updateWeight(objectVal);
-    val = Firebase.getInt(firebaseData, "_CONFIG/WEIGHT");
-    Serial.println(val); */
-    //testInt();
-    //testFloat("testFloat");
+    Serial.println(getUser());
+    updateDate();
+  */
+
+  /*
+    Serial.print("Date: ");
+    Serial.println(timeS());
+    delay(1000);
+  */
+  float objectVal = dataR();
+  Serial.println(objectVal);
+
+  if (buttonNew == 1) {
+    maxReading = maxData();
+    delay(500);
+    updateMaxWeight(maxReading);
   }
+
+  colorSetter(objectVal, maxReading);
+  if (objectVal < (maxReading * 0.98)) {
+    float objectVal = dataR();
+    drinkCounter(objectVal, maxReading);
+  }
+
+
+  /*
+    if (millis() - last10Minutes >= TENMINUTES) {
+     last10Minutes += TENMINUTES;
+     Serial.println("One Minutes Has Passed");
+     if (objectVal < 10) {
+       Serial.println("I am here");
+       blinkEmptyReminder(objectVal, objectVal);
+     } else {
+       blinkReminder(objectVal, objectVal);
+     }
+    }
+  */
+}
