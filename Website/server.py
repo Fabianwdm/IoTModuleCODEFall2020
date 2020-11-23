@@ -3,6 +3,8 @@ import pyrebase
 import sys
 import os
 from dotenv import load_dotenv
+from datetime import datetime
+
 
 load_dotenv()
 
@@ -31,7 +33,7 @@ def hex_to_rgb(value):
 @app.route("/", methods=["GET", "POST"])
 def home():
     lsts = []
-    users = db.child("users/Sarah/").get()
+    users = db.child("users/user/").get()
     for user in users.each():
         lsts.append(user.val())
     print(lsts)
@@ -44,43 +46,47 @@ def home():
                 request.form.get("reminderCup"),
                 request.form.get("emptyCup"),
                 request.form.get("fullCup"),
-				request.form.get("drinktotal"),
+                request.form.get("drinktotal"),
             ]
             data = [
                 {"name": dataList[0]},
-                {"reminder": dataList[1]},
+                {"remindertime": int(dataList[1])},
                 {"hexempty": dataList[3]},
                 {"hexfull": dataList[4]},
                 {"hexreminder": dataList[2]},
-				{"drinktotal": dataList[5]},
+                {"drinkToday": int(dataList[5])},
             ]
             c = 0
             for n in data:
-                db.child("users").child("Sarah").update(data[c])
+                db.child("users").child("user").update(data[c])
                 c += 1
 
+            db.child("users").child("user").child("drinktotal").child(
+                datetime.today().strftime("%Y-%m-%d")
+            ).update(data[5])
+
             lsts = []
-            users = db.child("users/Sarah/").get()
+            users = db.child("users/user/").get()
             for user in users.each():
                 lsts.append(user.val())
 
             return render_template(
                 "home.html",
-                timerVals=int(lsts[5]),
-                fname=str(lsts[4]),
-                reminderCup=lsts[3],
-                emptyCup=lsts[1],
-                fullCup=lsts[2],
-                test=(lsts[0]),
+                timerVals=int(lsts[7]),
+                fname=str(lsts[6]),
+                reminderCup=lsts[4],
+                emptyCup=lsts[2],
+                fullCup=lsts[3],
+                drinkTotal=(lsts[0]),
             )
     return render_template(
         "home.html",
-        timerVals=int(lsts[5]),
-        fname=str(lsts[4]),
-        reminderCup=lsts[3],
-        emptyCup=lsts[1],
-        fullCup=lsts[2],
-        test=(lsts[0]),
+        timerVals=int(lsts[7]),
+        fname=str(lsts[6]),
+        reminderCup=lsts[4],
+        emptyCup=lsts[2],
+        fullCup=lsts[3],
+        drinkTotal=(lsts[0]),
     )
 
 
